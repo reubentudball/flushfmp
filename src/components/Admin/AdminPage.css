@@ -1,0 +1,41 @@
+.admin-page-container {
+    display: flex;
+    max-height: 100vh; /* Changed from height: 100vh to min-height */
+}
+
+.admin-main-content {
+    flex: 1; 
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.admin-logout-button {
+    background-color: #ff4b4b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-logout-button:hover {
+    background-color: #ff7878;
+}
+
+@media (max-width: 768px) {
+    .admin-page-container {
+        flex-direction: column;
+    }
+
+    .admin-main-content {
+        padding: 10px;
+    }
+}

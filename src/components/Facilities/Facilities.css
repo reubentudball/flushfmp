@@ -1,0 +1,29 @@
+.facilities-container {
+    padding: 20px;
+  }
+  
+  .facilities-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .facility-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .facility-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .alert {
+    color: red;
+    font-weight: bold;
+  }
+  
