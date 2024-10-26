@@ -1,26 +1,28 @@
-/* Navigation.css */
-
 .navigation-container {
-    width: 200px; 
-    background-color: #333;
-    color: #fff;
-    padding: 20px;
-    height: 100vh;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  li {
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  
-  li:hover {
-    text-decoration: underline;
-  }
+  position: fixed; /* Keeps the navigation fixed on the left */
+  top: 0;
+  left: 0;
+  width: 200px; 
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  height: 100vh;
+  z-index: 1000; /* Ensure it stays above other elements */
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+li:hover {
+  text-decoration: underline;
+}
 
 li a {
   text-decoration: none;
@@ -32,21 +34,20 @@ li a {
 li a:hover {
   text-decoration: underline; 
 }
-  
 
-  .logout-button{
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background-color: #fff;
-    color: #333;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
+.logout-button {
+  position: absolute;
+  bottom: 50px;
+  left: 20px;
+  background-color: #fff;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
 
-  .logout-button:hover {
-    background-color: #333;
-    color: #fff;
-  }
+.logout-button:hover {
+  background-color: #333;
+  color: #fff;
+}

@@ -1,21 +1,24 @@
 .admin-page-container {
     display: flex;
-    max-height: 100vh; /* Changed from height: 100vh to min-height */
-}
-
-.admin-main-content {
+    max-height: 100vh;
+    margin-left: 220px; 
+  }
+  
+  .admin-main-content {
     flex: 1; 
     padding: 20px;
     background-color: #f4f4f4;
-}
-
-h2 {
+    height: 100vh; 
+    overflow-y: auto;
+  }
+  
+  h2 {
     font-size: 24px;
     margin-bottom: 20px;
     color: #333;
-}
-
-.admin-logout-button {
+  }
+  
+  .admin-logout-button {
     background-color: #ff4b4b;
     color: white;
     border: none;
@@ -24,18 +27,27 @@ h2 {
     border-radius: 5px;
     font-size: 16px;
     transition: background-color 0.3s ease;
-}
-
-.admin-logout-button:hover {
+  }
+  
+  .admin-logout-button:hover {
     background-color: #ff7878;
-}
-
-@media (max-width: 768px) {
+  }
+  
+  @media (max-width: 768px) {
     .admin-page-container {
-        flex-direction: column;
+      flex-direction: column;
+      margin-left: 0;
     }
-
+  
+    .navigation-container {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+  
     .admin-main-content {
-        padding: 10px;
+      padding: 10px;
+      margin-left: 0;
     }
-}
+  }
+  
