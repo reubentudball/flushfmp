@@ -1,37 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Facilities.css';
 import { useNavigate } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet'; 
+import { FaCommentDots } from 'react-icons/fa'; 
+import 'leaflet/dist/leaflet.css'; 
+import { getAllBathrooms } from '../Repo/bathroomRepository';
+
+const markerIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 const Facilities = () => {
+  const [facilities, setFacilities] = useState([]);
   const navigate = useNavigate();
 
-  const facilities = [
-    {
-      name: "Restroom A",
-      location: "Wing 1",
-      tickets: 2,
-      cleanlinessRating: 4.5,
-      visitors: 100,
-    },
-    {
-      name: "Restroom B",
-      location: "Wing 2",
-      tickets: 1,
-      cleanlinessRating: 4.0,
-      visitors: 150,
-    },
-    {
-      name: "Restroom C",
-      location: "Wing 3",
-      tickets: 0,
-      cleanlinessRating: 3.8,
-      visitors: 120,
-    },
-  ];
+  useEffect(() => {
+    const fetchFacilities = async () => {
+      try {
+        const data = await getAllBathrooms();
+        console.log(data);
+        setFacilities(data);
+      } catch (error) {
+        console.error("Error fetching facilities:", error);
+      }
+    };
+
+    fetchFacilities();
+  }, []);
 
   const handleFacilityClick = (facility) => {
-    navigate(`/admin/facilities/${facility.name.toLowerCase().replace(/ /g, '-')}`);
+    navigate(`/admin/facilities/${facility.title.toLowerCase().replace(/ /g, '-')}`, {
+    state: { facilityId: facility.id } });
   };
+
+  if (facilities.length === 0) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="facilities-container">
@@ -40,15 +49,37 @@ const Facilities = () => {
         {facilities.map((facility, index) => (
           <li key={index} className="facility-item" onClick={() => handleFacilityClick(facility)}>
             <div className="facility-info">
-              <h3>{facility.name}</h3>
-              <p>Location: {facility.location}</p>
-              <p>Tickets: {facility.tickets}</p>
-              <p>Cleanliness Rating: {facility.cleanlinessRating}</p>
+              <h3>{facility.title}</h3>
+              <p>Directions: {facility.directions}</p>
+              <p>Location: {facility.location._lat}, {facility.location._long}</p>
+              <p>
+                <FaCommentDots /> {facility.comments.length} Comments
+              </p>
             </div>
-            {facility.tickets > 0 && <span className="alert">⚠️ {facility.tickets} Outstanding Tickets</span>}
           </li>
         ))}
       </ul>
+
+      <div className="map-container" style={{ height: '500px', marginTop: '20px' }}>
+        <MapContainer center={[facilities[0].location._lat, facilities[0].location._long]} zoom={13} style={{ height: '100%', width: '100%' }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {facilities.map((facility, index) => (
+            <Marker
+              key={index}
+              position={[facility.location._lat, facility.location._long]}
+              icon={markerIcon}
+            >
+              <Popup>
+                <strong>{facility.title}</strong><br />
+                {facility.directions}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
     </div>
   );
 };

@@ -1,29 +1,68 @@
 .facilities-container {
-    padding: 20px;
-  }
-  
-  .facilities-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .facility-item {
-    background-color: #f9f9f9;
-    padding: 15px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-  }
-  
-  .facility-info {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .alert {
-    color: red;
-    font-weight: bold;
-  }
-  
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.facilities-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 800px; 
+}
+
+.facility-item {
+  background-color: #fff;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px; 
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.facility-item:hover {
+  background-color: #f0f8ff; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.facility-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.facility-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.facility-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.facility-info p:last-child {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.alert {
+  color: red;
+  font-weight: bold;
+}
+
+.map-container {
+  width: 100%;
+  max-width: 800px; 
+  margin-top: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
