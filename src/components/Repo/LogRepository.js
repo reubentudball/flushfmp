@@ -1,6 +1,5 @@
-import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, where } from "firebase/firestore";
 import { db } from "../conf/firebaseConfig";
-
 
 export const logActivity = async (logData) => {
   try {
@@ -15,11 +14,11 @@ export const logActivity = async (logData) => {
   }
 };
 
-
-export const fetchRecentLogs = async (limitCount = 10) => {
+export const fetchRecentLogs = async (adminIds, limitCount = 10) => {
   try {
     const q = query(
       collection(db, "ActivityLogs"),
+      where("actor", "in", adminIds), 
       orderBy("timestamp", "desc"),
       limit(limitCount)
     );

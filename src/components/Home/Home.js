@@ -1,35 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchRecentLogs } from "../Repo/LogRepository";
+import { useUser } from "../context/UserContext"; 
 import "./Home.css";
 
 const Home = () => {
+  const { facility } = useUser(); 
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    const loadLogs = async () => {
+    const loadLogsForFacility = async () => {
+      if (!facility || !facility.adminIds) {
+        console.warn("Facility data or admin IDs not available.");
+        return;
+      }
+
       try {
-        const fetchedLogs = await fetchRecentLogs();
-        const formattedLogs = fetchedLogs.map((log) => ({
-          ...log,
-          timestamp: log.timestamp
-            ? log.timestamp.toDate().toLocaleString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "Unknown date", // Fallback for missing timestamps
-        }));
-        setLogs(formattedLogs);
+        const fetchedLogs = await fetchRecentLogs(facility.adminIds); 
+        setLogs(
+          fetchedLogs.map((log) => ({
+            ...log,
+            timestamp: log.timestamp
+              ? log.timestamp.toDate().toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "Unknown date",
+          }))
+        );
       } catch (error) {
         console.error("Error loading recent activity logs:", error);
       }
     };
 
-    loadLogs();
-  }, []);
+    loadLogsForFacility();
+  }, [facility]);
 
   return (
     <div className="homepage-container">
