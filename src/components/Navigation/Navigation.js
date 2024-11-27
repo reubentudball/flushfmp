@@ -10,6 +10,8 @@ const Navigation = () => {
 
 
   const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('facility');
     navigate('/');
   };
 

@@ -1,26 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Line, Pie } from 'react-chartjs-2';
-import { useLocation } from 'react-router-dom';
-import './FacilityDashboard.css';
-import { analyzeSentiment } from '../Util/SentimentAnalysis';
-import { getBathroomById, getReviewsFromBathroom } from '../Repo/bathroomRepository';
+import React, { useEffect, useState } from "react";
+import { Line, Pie } from "react-chartjs-2";
+import { useLocation } from "react-router-dom";
+import "./FacilityDashboard.css";
+import {
+  getBathroomById,
+  getReviewsFromBathroom,
+  deleteComment,
+  deleteReview,
+} from "../Repo/bathroomRepository";
 
 const FacilityDashboard = ({ facilityName }) => {
   const [cleanlinessData, setCleanlinessData] = useState(null);
   const [commentSentimentData, setCommentSentimentData] = useState(null);
   const [facilityNotFound, setFacilityNotFound] = useState(false);
-  const [commentsWithSentiment, setCommentsWithSentiment] = useState([]); 
-  const [reviews, setReviews] = useState([]); 
+  const [comments, setComments] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const location = useLocation();
   const facilityId = location.state?.facilityId;
 
-  // Map cleanliness strings to numerical values for chart plotting
   const cleanlinessMap = {
-    'Very Clean': 4,
-    'Clean': 3,
-    'Messy': 2,
-    'Very Messy': 1,
+    "Very Clean": 4,
+    Clean: 3,
+    Messy: 2,
+    "Very Messy": 1,
   };
 
   useEffect(() => {
@@ -37,63 +40,79 @@ const FacilityDashboard = ({ facilityName }) => {
           return;
         }
 
-        // Fetch reviews for the bathroom
-        const reviewsData = await getReviewsFromBathroom(facilityId);
-        setReviews(reviewsData); 
+        setComments(facility.comments || []);
 
-        // Create cleanliness data over time, assuming each review happened at a fixed interval
+        const reviewsData = await getReviewsFromBathroom(facilityId);
+        setReviews(reviewsData);
+
         const timestamps = reviewsData.map((_, i) => {
-          // Simulate timestamps (e.g., review every 7 days)
           const fakeDate = new Date();
-          fakeDate.setDate(fakeDate.getDate() - (reviewsData.length - i) * 7); // Spread reviews over weeks
-          return fakeDate.toLocaleDateString(); // Convert to readable format
+          fakeDate.setDate(fakeDate.getDate() - (reviewsData.length - i) * 7);
+          return fakeDate.toLocaleDateString();
         });
 
-        const cleanlinessRatings = reviewsData.map(review => cleanlinessMap[review.cleanliness] || 0);
+        const cleanlinessRatings = reviewsData.map(
+          (review) => cleanlinessMap[review.cleanliness] || 0
+        );
 
         setCleanlinessData({
-          labels: timestamps, // Simulated review dates
-          datasets: [{
-            label: 'Cleanliness Score Over Time',
-            data: cleanlinessRatings.length > 0 ? cleanlinessRatings : [0],
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            borderWidth: 2,
-            fill: false, // Line should not be filled below
-            tension: 0.3, // Add some curvature to the line
-          }],
+          labels: timestamps,
+          datasets: [
+            {
+              label: "Cleanliness Score Over Time",
+              data: cleanlinessRatings.length > 0 ? cleanlinessRatings : [0],
+              backgroundColor: "rgba(75,192,192,0.4)",
+              borderColor: "rgba(75,192,192,1)",
+              borderWidth: 2,
+              fill: false,
+              tension: 0.3,
+            },
+          ],
         });
 
-        // Process comments and analyze sentiment
-        let sentimentScores = [];
-        let commentsData = [];
-        if (facility.comments && facility.comments.length > 0) {
-          for (const comment of facility.comments) {
-            const score = await analyzeSentiment(comment);
-            sentimentScores.push(score);
-            commentsData.push({ text: comment, sentimentScore: score });
-          }
-        }
+        const sentimentCounts = {
+          positive: 0,
+          neutral: 0,
+          negative: 0,
+        };
 
-        setCommentsWithSentiment(commentsData);
+        facility.comments.forEach((comment) => {
+          const { sentimentScore } = comment;
+          if (sentimentScore > 0.2) {
+            sentimentCounts.positive++;
+          } else if (sentimentScore >= -0.2 && sentimentScore <= 0.2) {
+            sentimentCounts.neutral++;
+          } else if (sentimentScore < -0.2) {
+            sentimentCounts.negative++;
+          }
+        });
 
         setCommentSentimentData({
-          labels: ['Positive', 'Neutral', 'Negative'],
-          datasets: [{
-            label: 'Comment Sentiment',
-            data: [
-              sentimentScores.filter(score => score > 0.2).length, // Positive
-              sentimentScores.filter(score => score >= -0.2 && score <= 0.2).length, // Neutral
-              sentimentScores.filter(score => score < -0.2).length, // Negative
-            ],
-            backgroundColor: ['rgba(75,192,192,0.6)', 'rgba(255,206,86,0.6)', 'rgba(255,99,132,0.6)'],
-            borderColor: ['rgba(75,192,192,1)', 'rgba(255,206,86,1)', 'rgba(255,99,132,1)'],
-            borderWidth: 2,
-          }],
+          labels: ["Positive", "Neutral", "Negative"],
+          datasets: [
+            {
+              label: "Comment Sentiment",
+              data: [
+                sentimentCounts.positive,
+                sentimentCounts.neutral,
+                sentimentCounts.negative,
+              ],
+              backgroundColor: [
+                "rgba(75,192,192,0.6)",
+                "rgba(255,206,86,0.6)",
+                "rgba(255,99,132,0.6)",
+              ],
+              borderColor: [
+                "rgba(75,192,192,1)",
+                "rgba(255,206,86,1)",
+                "rgba(255,99,132,1)",
+              ],
+              borderWidth: 2,
+            },
+          ],
         });
-
       } catch (error) {
-        console.error('Error fetching data', error);
+        console.error("Error fetching data", error);
       }
     };
 
@@ -107,6 +126,34 @@ const FacilityDashboard = ({ facilityName }) => {
   if (!cleanlinessData || !commentSentimentData) {
     return <div>Loading...</div>;
   }
+
+  const handleDeleteComment = async (commentIndex) => {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      try {
+        const updatedComments = comments.filter(
+          (_, index) => index !== commentIndex
+        );
+        setComments(updatedComments);
+        await deleteComment(facilityId, commentIndex);
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+      }
+    }
+  };
+
+  const handleDeleteReview = async (reviewIndex) => {
+    if (window.confirm("Are you sure you want to delete this review?")) {
+      try {
+        const updatedReviews = reviews.filter(
+          (_, index) => index !== reviewIndex
+        );
+        setReviews(updatedReviews);
+        await deleteReview(facilityId, reviewIndex);
+      } catch (error) {
+        console.error("Error deleting review:", error);
+      }
+    }
+  };
 
   return (
     <div className="facility-dashboard-container">
@@ -125,14 +172,25 @@ const FacilityDashboard = ({ facilityName }) => {
 
       <div className="comments-section">
         <h3>Comments and Sentiment Scores</h3>
-        {commentsWithSentiment.length === 0 ? (
+        {comments.length === 0 ? (
           <p>No comments available for this facility.</p>
         ) : (
           <ul className="comments-list">
-            {commentsWithSentiment.map((commentData, index) => (
+            {comments.map((comment, index) => (
               <li key={index} className="comment-item">
-                <p><strong>Comment:</strong> {commentData.text}</p>
-                <p><strong>Sentiment Score:</strong> {commentData.sentimentScore.toFixed(2)}</p>
+                <p>
+                  <strong>Comment:</strong> {comment.reviewText}
+                </p>
+                <p>
+                  <strong>Sentiment Score:</strong>{" "}
+                  {comment.sentimentScore?.toFixed(2) || "N/A"}
+                </p>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteComment(index)}
+                >
+                  Delete Comment
+                </button>
               </li>
             ))}
           </ul>
@@ -147,8 +205,19 @@ const FacilityDashboard = ({ facilityName }) => {
           <ul className="reviews-list">
             {reviews.map((review, index) => (
               <li key={index} className="review-item">
-                <p><strong>Cleanliness:</strong> {review.cleanliness} ({cleanlinessMap[review.cleanliness]} out of 4)</p>
-                <p><strong>Review Text:</strong> {review.comment || "No comment"}</p>
+                <p>
+                  <strong>Cleanliness:</strong> {review.cleanliness} (
+                  {cleanlinessMap[review.cleanliness]} out of 4)
+                </p>
+                <p>
+                  <strong>Review Text:</strong> {review.comment || "No comment"}
+                </p>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteReview(index)}
+                >
+                  Delete Review
+                </button>
               </li>
             ))}
           </ul>
