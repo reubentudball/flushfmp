@@ -47,7 +47,7 @@ const Login = () => {
       const userData = userDoc.data();
   
       setUser({
-        ...userData, 
+        ...userData,
       });
   
       setFacility({
@@ -55,12 +55,14 @@ const Login = () => {
         ...facilityData,
       });
   
+      console.log("Navigating to /admin...");
       navigate("/admin");
     } catch (err) {
       console.error("Login Error:", err);
       setError(err.message || "Failed to log in. Please try again.");
     }
   };
+  
 
   const handleCreateAccount = () => {
     navigate("/create-account");
