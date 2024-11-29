@@ -1,0 +1,36 @@
+.work-orders-container {
+    padding: 20px;
+  }
+  
+  .work-orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .work-order-item {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .work-order-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .add-work-order-button {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-work-order-button:hover {
+    background-color: #0056b3;
+  }
+  

@@ -21,9 +21,9 @@ const Navigation = () => {
       <ul>
         <li><Link to="/admin">Home</Link></li>
         <li><Link to="/admin/dashboard">Dashboard</Link></li>
-        <li><Link to="/admin/profile">Your Profile</Link></li>
         <li><Link to="/admin/facilities">Facilities</Link></li>
-        <li><Link to="/admin/employees">Employees</Link></li>
+        <li><Link to="/admin/work-management">Work Management</Link></li>
+        <li><Link to="/admin/profile">Your Profile</Link></li>
       </ul>
       <button className='logout-button' onClick={handleLogout}>Logout</button>
     </div>
