@@ -51,8 +51,8 @@ const Home = () => {
         <Link to="/admin/facilities" className="homepage-link">
           View Facilities
         </Link>
-        <Link to="/admin/employees" className="homepage-link">
-          Manage Employees
+        <Link to="/admin/work-management" className="homepage-link">
+          Manage Work
         </Link>
       </div>
 

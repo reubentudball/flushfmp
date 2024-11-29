@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; 
-import { getEmployeeById, getWorkOrdersByEmployee } from "../Repo/employeeRepository"; 
+import { getEmployeeById, getWorkOrdersByEmployee } from "../../Repo/employeeRepository"; 
 import "./EmployeeInfo.css";
 
 const EmployeeInfo = () => {

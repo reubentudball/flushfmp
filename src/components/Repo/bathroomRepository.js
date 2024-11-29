@@ -7,13 +7,13 @@ const createBathroom = async (bathroom, facilityId = null) => {
     const bathroomData = {
       ...bathroom,
       comments: [],
-      isVerified: false, 
-      facilityID: facilityId || 0, 
+      isVerified: false,
+      facilityID: facilityId || 0,
     };
 
     const bathroomRef = await addDoc(collection(db, 'Bathroom'), bathroomData);
     console.log('Bathroom added with ID:', bathroomRef.id);
-    return { id: bathroomRef.id, ...bathroomData }; 
+    return { id: bathroomRef.id, ...bathroomData };
   } catch (e) {
     console.error('Error adding bathroom:', e);
     throw e;
@@ -26,6 +26,7 @@ const createReview = async (bathroomId, review) => {
     console.log('Review added with ID:', reviewRef.id);
   } catch (e) {
     console.error('Error adding review:', e);
+    throw e;
   }
 };
 
@@ -46,20 +47,20 @@ const getAllBathrooms = async () => {
 
 const getBathroomsWithinRadius = async (facilityCoords, radius) => {
   try {
-    const bathroomsSnapshot = await getDocs(collection(db, "Bathroom"));
+    const bathroomsSnapshot = await getDocs(collection(db, 'Bathroom'));
     const bathrooms = bathroomsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
     const filteredBathrooms = bathrooms.filter((bathroom) => {
-      if (!bathroom.location) return false;
+      if (!bathroom.geo?.geopoint) return false;
 
       const distance = calculateDistance(
         facilityCoords._lat,
         facilityCoords._long,
-        bathroom.location._lat,
-        bathroom.location._long
+        bathroom.geo.geopoint.latitude,
+        bathroom.geo.geopoint.longitude
       );
 
       return distance <= radius;
@@ -68,11 +69,10 @@ const getBathroomsWithinRadius = async (facilityCoords, radius) => {
     console.log(`Filtered ${filteredBathrooms.length} bathrooms within radius.`);
     return filteredBathrooms;
   } catch (e) {
-    console.error("Error fetching bathrooms:", e);
+    console.error('Error fetching bathrooms within radius:', e);
     throw e;
   }
 };
-
 
 const getReviewsFromBathroom = async (bathroomId) => {
   try {
@@ -90,15 +90,14 @@ const getReviewsFromBathroom = async (bathroomId) => {
 
 const updateBathroom = async (bathroomId, updatedData) => {
   try {
-    const bathroomRef = doc(db, "Bathroom", bathroomId);
+    const bathroomRef = doc(db, 'Bathroom', bathroomId);
     await updateDoc(bathroomRef, updatedData);
-    console.log("Bathroom updated successfully");
+    console.log('Bathroom updated successfully');
   } catch (e) {
-    console.error("Error updating bathroom:", e);
+    console.error('Error updating bathroom:', e);
     throw e;
   }
 };
-
 
 const deleteBathroom = async (bathroomId) => {
   try {
@@ -155,7 +154,7 @@ const addComment = async (bathroomId, comment) => {
     const bathroomSnap = await getDoc(bathroomRef);
     if (bathroomSnap.exists()) {
       const currentComments = bathroomSnap.data().comments || [];
-      const updatedComments = [...currentComments, comment]; 
+      const updatedComments = [...currentComments, comment];
       await updateDoc(bathroomRef, { comments: updatedComments });
       console.log('Comment added successfully');
     } else {
@@ -174,7 +173,7 @@ const deleteComment = async (bathroomId, commentIndex) => {
     if (bathroomSnap.exists()) {
       const currentComments = bathroomSnap.data().comments || [];
       if (commentIndex >= 0 && commentIndex < currentComments.length) {
-        const updatedComments = currentComments.filter((_, index) => index !== commentIndex); 
+        const updatedComments = currentComments.filter((_, index) => index !== commentIndex);
         await updateDoc(bathroomRef, { comments: updatedComments });
         console.log('Comment deleted successfully');
       } else {
@@ -205,18 +204,17 @@ const verifyBathroom = async (bathroomId, facilityId) => {
 
 const unverifyBathroom = async (bathroomId) => {
   try {
-    const bathroomRef = doc(db, "Bathroom", bathroomId);
+    const bathroomRef = doc(db, 'Bathroom', bathroomId);
     await updateDoc(bathroomRef, {
       isVerified: false,
       facilityID: null,
     });
     console.log(`Bathroom ${bathroomId} unverified successfully.`);
-  } catch (error) {
-    console.error("Error unverifying bathroom:", error);
-    throw error;
+  } catch (e) {
+    console.error('Error unverifying bathroom:', e);
+    throw e;
   }
 };
-
 
 export {
   createBathroom,
@@ -228,9 +226,9 @@ export {
   deleteBathroom,
   updateReview,
   deleteReview,
-  addComment,    
-  deleteComment,  
+  addComment,
+  deleteComment,
   getBathroomsWithinRadius,
   verifyBathroom,
-  unverifyBathroom
+  unverifyBathroom,
 };

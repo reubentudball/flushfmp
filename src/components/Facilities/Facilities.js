@@ -38,7 +38,7 @@ const verifiedMarkerIcon = new L.Icon({
 const Facilities = () => {
   const [facilities, setFacilities] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newBathroom, setNewBathroom] = useState({ title: "", directions: "", location: { _lat: "", _long: "" } });
+  const [newBathroom, setNewBathroom] = useState({ title: "", directions: "", geo: { geopoint: { latitude: "", longitude: "" } } });
   const { facility: facilityContext, user } = useUser();
   const navigate = useNavigate();
 
@@ -143,7 +143,8 @@ const Facilities = () => {
   
   const handleAddBathroom = async () => {
     try {
-      if (!newBathroom.title || !newBathroom.directions || !newBathroom.location._lat || !newBathroom.location._long) {
+      const { latitude, longitude } = newBathroom.geo.geopoint;
+      if (!newBathroom.title || !newBathroom.directions || !latitude || !longitude) {
         alert("All fields are required.");
         return;
       }
@@ -155,7 +156,7 @@ const Facilities = () => {
       });
       setFacilities((prev) => [...prev, addedBathroom]);
       setIsModalOpen(false);
-      setNewBathroom({ title: "", directions: "", location: { _lat: "", _long: "" } });
+      setNewBathroom({ title: "", directions: "", geo: { geopoint: { latitude: "", longitude: "" } } });
   
       await logActivity({
         action: "Added Bathroom",
@@ -191,7 +192,7 @@ const Facilities = () => {
             createBathroom({
               title,
               directions,
-              location: { _lat: lat, _long: lng },
+              geo: { geopoint: { latitude: lat, longitude: lng } },
               isVerified: true,
               facilityID: facility.facilityId,
             })
@@ -235,7 +236,7 @@ const Facilities = () => {
               <h3>{bathroom.title}</h3>
               <p>Directions: {bathroom.directions}</p>
               <p>
-                Location: {bathroom.location._lat}, {bathroom.location._long}
+                Location: {bathroom.geo.geopoint.latitude}, {bathroom.geo.geopoint.longitude}
               </p>
               <p>
                 <FaCommentDots /> {bathroom.comments?.length || 0} Comments
@@ -271,7 +272,7 @@ const Facilities = () => {
               </div>
             </div>
           </li>
-                  ))}
+        ))}
       </ul>
 
       <div className="map-container">
@@ -294,7 +295,7 @@ const Facilities = () => {
           {facilities.map((bathroom, index) => (
             <Marker
               key={index}
-              position={[bathroom.location._lat, bathroom.location._long]}
+              position={[bathroom.geo.geopoint.latitude, bathroom.geo.geopoint.longitude]}
               icon={bathroom.isVerified ? verifiedMarkerIcon : unverifiedMarkerIcon}
             >
               <Popup>
@@ -333,22 +334,22 @@ const Facilities = () => {
             <label>Latitude:</label>
             <input
               type="number"
-              value={newBathroom.location._lat || ""}
+              value={newBathroom.geo.geopoint.latitude || ""}
               onChange={(e) =>
                 setNewBathroom({
                   ...newBathroom,
-                  location: { ...newBathroom.location, _lat: parseFloat(e.target.value) },
+                  geo: { ...newBathroom.geo, geopoint: { ...newBathroom.geo.geopoint, latitude: parseFloat(e.target.value) } },
                 })
               }
             />
             <label>Longitude:</label>
             <input
               type="number"
-              value={newBathroom.location._long || ""}
+              value={newBathroom.geo.geopoint.longitude || ""}
               onChange={(e) =>
                 setNewBathroom({
                   ...newBathroom,
-                  location: { ...newBathroom.location, _long: parseFloat(e.target.value) },
+                  geo: { ...newBathroom.geo, geopoint: { ...newBathroom.geo.geopoint, longitude: parseFloat(e.target.value) } },
                 })
               }
             />

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FaTh, FaList } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Modal from "react-modal";
-import { useUser } from "../context/UserContext";
-import { getEmployeesByFacility, addEmployee } from "../Repo/employeeRepository";
+import { useUser } from "../../context/UserContext";
+import { getEmployeesByFacility, addEmployee } from "../../Repo/employeeRepository";
 import "./Employees.css";
 
 const Employees = () => {
@@ -19,6 +19,7 @@ const Employees = () => {
 
   const { facility } = useUser();
   const navigate = useNavigate();
+  const location = useLocation(); 
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -40,7 +41,7 @@ const Employees = () => {
 
   const handleEmployeeClick = (id) => {
     console.log("Employee ID:", id);
-    navigate(`/admin/employees/${id}`);
+    navigate(`${location.pathname}/${id}`);
   };
 
   const openModal = () => setIsModalOpen(true);
@@ -93,7 +94,9 @@ const Employees = () => {
             key={index}
             onClick={() => handleEmployeeClick(employee.id)}
           >
-            <h3 style={{textAlign:"center"}}>{employee.firstName} {employee.lastName}</h3>
+            <h3 style={{ textAlign: "center" }}>
+              {employee.firstName} {employee.lastName}
+            </h3>
             <p>
               <strong>Role:</strong> {employee.role}
             </p>

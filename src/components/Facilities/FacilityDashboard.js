@@ -210,7 +210,7 @@ const FacilityDashboard = ({ facilityName }) => {
                   {cleanlinessMap[review.cleanliness]} out of 4)
                 </p>
                 <p>
-                  <strong>Review Text:</strong> {review.comment || "No comment"}
+                  <strong>Review Text:</strong> {review.feedback || "No comment"}
                 </p>
                 <button
                   className="delete-button"
