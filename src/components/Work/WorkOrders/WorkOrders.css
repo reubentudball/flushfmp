@@ -1,36 +1,108 @@
 .work-orders-container {
-    padding: 20px;
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.work-orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.work-orders-header-title {
+  font-size: 24px;
+  color: #2c3e50;
+}
+
+.add-work-order-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-work-order-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.add-work-order-button:active {
+  background-color: #003d80;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.work-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.work-order-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: linear-gradient(145deg, #f1f3f5, #ffffff);
+  box-shadow: 4px 4px 8px #d1d9e0, -4px -4px 8px #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.work-order-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.5);
+}
+
+.work-order-item-title {
+  font-size: 18px;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.work-order-item-detail {
+  font-size: 14px;
+  color: #555;
+  margin: 5px 0;
+}
+
+.attached-bathrooms, .attached-tickets {
+  margin-top: 15px;
+}
+
+.attached-bathrooms strong, .attached-tickets strong {
+  color: #495057;
+}
+
+.no-work-orders {
+  font-size: 16px;
+  text-align: center;
+  color: #6c757d;
+}
+
+@media (max-width: 768px) {
+  .work-orders-container {
+      padding: 20px;
   }
-  
-  .work-orders-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .work-order-item {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .work-order-item:hover {
-    background-color: #f0f0f0;
-  }
-  
+
   .add-work-order-button {
-    margin-bottom: 20px;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+      padding: 8px 16px;
+      font-size: 12px;
   }
-  
-  .add-work-order-button:hover {
-    background-color: #0056b3;
+
+  .work-order-item {
+      padding: 15px;
   }
-  
+}

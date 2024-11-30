@@ -41,8 +41,8 @@ exports.analyzeSentiments = onSchedule("every 24 hours", async (event) => {
               if (!comment.processed) {
                   try {
                       const sentimentScore = await analyzeSentiment(comment.reviewText);
-                      comment.sentimentScore = sentimentScore; // Add sentiment score
-                      comment.processed = true; // Mark as processed
+                      comment.sentimentScore = sentimentScore; 
+                      comment.processed = true; 
                       processedCount++;
                   } catch (err) {
                       console.error(`Error processing comment for bathroom ${bathroomId}:`, err);
@@ -65,135 +65,130 @@ exports.analyzeSentiments = onSchedule("every 24 hours", async (event) => {
 });
 
 
-exports.calculateHealthScores = onSchedule("every day at 12:30 AM", async (event) => {
+exports.calculateHealthScores = onSchedule("every 24 hours", async (event) => {
   console.log("Running scheduled health score calculation...");
 
   try {
-      const bathroomsSnapshot = await db.collection("Bathroom").get();
-      if (bathroomsSnapshot.empty) {
-          console.log("No bathrooms found.");
-          return;
+    const bathroomsSnapshot = await db.collection("Bathroom").get();
+
+    if (bathroomsSnapshot.empty) {
+      console.log("No bathrooms found.");
+      return;
+    }
+
+    for (const bathroomDoc of bathroomsSnapshot.docs) {
+      const bathroomId = bathroomDoc.id;
+
+      let cleanlinessWeight = 0;
+      let commentWeight = 0;
+
+      const cleanWeightValue = 0.75; 
+      const commentWeightValue = 0.25;
+
+      const reviewsSnapshot = await db
+        .collection("Bathroom")
+        .doc(bathroomId)
+        .collection("Reviews")
+        .get();
+
+      const reviews = reviewsSnapshot.docs.map((doc) => doc.data());
+      const bathroomReviewsCount = reviews.length;
+
+      if (bathroomReviewsCount > 0) {
+        const totalCleanlinessScore = reviews.reduce(
+          (sum, review) => sum + Math.min(5, review.cleanliness || 1), 
+          0
+        );
+
+        cleanlinessWeight =
+          ((totalCleanlinessScore / bathroomReviewsCount) / 5) * 100 * cleanWeightValue;
       }
 
-      for (const bathroomDoc of bathroomsSnapshot.docs) {
-          const bathroomData = bathroomDoc.data();
-          const bathroomId = bathroomDoc.id;
+      const comments = bathroomDoc.data().comments || [];
+      const totalCommentCount = comments.length;
 
-          let cleanlinessWeight = 0;
-          let commentWeight = 0;
-
-          const cleanWeightValue = 0.75;
-          const commentWeightValue = 0.25;
-
-          const reviews = bathroomData.reviews || [];
-          for (const review of reviews) {
-              const cleanliness = review.cleanliness;
-              if (cleanliness === "Very Clean") cleanlinessWeight += 4.0;
-              else if (cleanliness === "Clean") cleanlinessWeight += 3.0;
-              else if (cleanliness === "Messy") cleanlinessWeight += 2.0;
-              else if (cleanliness === "Very Messy") cleanlinessWeight += 1.0;
-          }
-
-          if (reviews.length > 0) {
-              cleanlinessWeight = 
-                  (((cleanlinessWeight / reviews.length) / 4.0) * 100) * cleanWeightValue;
-          }
-
-          const comments = bathroomData.comments || [];
-          for (const comment of comments) {
-              if (comment.processed && comment.sentimentScore !== undefined) {
-                  commentWeight += comment.sentimentScore;
-              }
-          }
-
-          if (comments.length > 0) {
-              commentWeight = (commentWeight / comments.length) * 100 * commentWeightValue;
-          }
-
-          const healthScore = cleanlinessWeight + commentWeight;
-
-          await db.collection("Bathroom").doc(bathroomId).update({
-              healthScore: healthScore,
-          });
-
-          console.log(`Updated bathroom ${bathroomId} with health score ${healthScore}.`);
+      for (const comment of comments) {
+        if (comment.processed && comment.sentimentScore !== undefined) {
+          const normalizedSentiment = Math.max(0, Math.min(1, comment.sentimentScore));
+          commentWeight += normalizedSentiment;
+        }
       }
 
-      console.log("Health score calculation completed.");
+      if (totalCommentCount > 0) {
+        commentWeight = (commentWeight / totalCommentCount) * 100 * commentWeightValue;
+      }
+
+      cleanlinessWeight = Math.max(0, cleanlinessWeight);
+      commentWeight = Math.max(0, commentWeight);
+
+      const healthScore = Math.min(100, cleanlinessWeight + commentWeight); 
+
+      await db.collection("Bathroom").doc(bathroomId).update({
+        healthScore: healthScore,
+      });
+
+      console.log(`Updated bathroom ${bathroomId} with health score ${healthScore}.`);
+    }
+
+    console.log("Health score calculation completed.");
   } catch (error) {
-      console.error("Error calculating health scores:", error);
+    console.error("Error calculating health scores:", error);
   }
 });
 
-exports.updateBathroomScores = onDocumentCreated(
-  "Bathroom/{bathroomId}/Reviews/{reviewId}",
-  async (event) => {
-    console.log("Updating bathroom scores due to new or updated review...");
 
-    try {
-      const { bathroomId } = event.params;
+exports.calculateAverageScores = onSchedule("every 24 hours", async (context) => {
+  console.log("Running scheduled average score calculation...");
 
-      const reviewsSnapshot = await db
-        .collection(`Bathroom/${bathroomId}/Reviews`)
-        .get();
+  try {
+    const bathroomsSnapshot = await db.collection("Bathroom").get();
+
+    if (bathroomsSnapshot.empty) {
+      console.log("No bathrooms found.");
+      return;
+    }
+
+    for (const bathroomDoc of bathroomsSnapshot.docs) {
+      const bathroomId = bathroomDoc.id;
+      const reviewsCollection = db.collection(`Bathroom/${bathroomId}/Reviews`);
+      const reviewsSnapshot = await reviewsCollection.get();
 
       if (reviewsSnapshot.empty) {
-        console.log(`No reviews found for Bathroom ${bathroomId}`);
-        return;
+        console.log(`No reviews for bathroom: ${bathroomId}`);
+        continue;
       }
 
-      let totalCleanliness = 0;
-      let totalQuietness = 0;
-      let totalAccessibility = 0;
-      const reviewCount = reviewsSnapshot.size;
+      let cleanlinessSum = 0;
+      let trafficSum = 0;
+      let sizeSum = 0;
+      let reviewCount = 0;
 
-      reviewsSnapshot.forEach((doc) => {
-        const review = doc.data();
-        totalCleanliness += mapScore(review.cleanliness);
-        totalQuietness += mapScore(review.traffic);
-        totalAccessibility += review.accessibility ? 1 : 0;
+      reviewsSnapshot.forEach((reviewDoc) => {
+        const reviewData = reviewDoc.data();
+        cleanlinessSum += reviewData.cleanliness || 0;
+        trafficSum += reviewData.traffic || 0;
+        sizeSum += reviewData.size || 0;
+        reviewCount++;
       });
 
-      const cleanlinessScore = totalCleanliness / reviewCount;
-      const quietnessScore = totalQuietness / reviewCount;
-      const accessibilityScore = (totalAccessibility / reviewCount) * 100;
-
-      const healthScore =
-        cleanlinessScore * 0.5 +
-        quietnessScore * 0.3 +
-        accessibilityScore * 0.2;
+      const cleanlinessScore = reviewCount > 0 ? (cleanlinessSum / reviewCount) : 0;
+      const trafficScore = reviewCount > 0 ? (trafficSum / reviewCount) : 0;
+      const sizeScore = reviewCount > 0 ? (sizeSum / reviewCount) : 0;
 
       await db.collection("Bathroom").doc(bathroomId).update({
         cleanlinessScore,
-        quietnessScore,
-        accessibilityScore,
-        healthScore,
+        trafficScore,
+        sizeScore,
       });
 
-      console.log(
-        `Updated scores for Bathroom ${bathroomId}: Cleanliness (${cleanlinessScore}), Quietness (${quietnessScore}), Accessibility (${accessibilityScore}), Health (${healthScore})`
-      );
-    } catch (error) {
-      console.error("Error updating bathroom scores:", error);
+      console.log(`Updated bathroom ${bathroomId} with:
+        Cleanliness: ${cleanlinessScore.toFixed(1)} stars,
+        Traffic: ${trafficScore.toFixed(1)} stars,
+        Size: ${sizeScore.toFixed(1)} stars`);
     }
-  }
-);
 
-function mapScore(value) {
-  switch (value) {
-    case "Very Clean":
-    case "Very Quiet":
-      return 4;
-    case "Clean":
-    case "Quiet":
-      return 3;
-    case "Messy":
-    case "Noisy":
-      return 2;
-    case "Very Messy":
-    case "Very Noisy":
-      return 1;
-    default:
-      return 0;
+    console.log("Average score calculation completed.");
+  } catch (error) {
+    console.error("Error calculating average scores:", error);
   }
-}
+});

@@ -19,12 +19,13 @@ const FacilityDashboard = ({ facilityName }) => {
   const location = useLocation();
   const facilityId = location.state?.facilityId;
 
-  const cleanlinessMap = {
-    "Very Clean": 4,
-    Clean: 3,
-    Messy: 2,
-    "Very Messy": 1,
-  };
+  const cleanlinessDescriptions = [
+    "Very Messy",
+    "Messy",
+    "Clean",
+    "Very Clean",
+    "Spotless",
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,14 +46,12 @@ const FacilityDashboard = ({ facilityName }) => {
         const reviewsData = await getReviewsFromBathroom(facilityId);
         setReviews(reviewsData);
 
-        const timestamps = reviewsData.map((_, i) => {
-          const fakeDate = new Date();
-          fakeDate.setDate(fakeDate.getDate() - (reviewsData.length - i) * 7);
-          return fakeDate.toLocaleDateString();
-        });
+        const timestamps = reviewsData.map((review) =>
+          new Date(review.createdAt.seconds * 1000).toLocaleDateString()
+        );
 
         const cleanlinessRatings = reviewsData.map(
-          (review) => cleanlinessMap[review.cleanliness] || 0
+          (review) => review.cleanliness
         );
 
         setCleanlinessData({
@@ -206,11 +205,25 @@ const FacilityDashboard = ({ facilityName }) => {
             {reviews.map((review, index) => (
               <li key={index} className="review-item">
                 <p>
-                  <strong>Cleanliness:</strong> {review.cleanliness} (
-                  {cleanlinessMap[review.cleanliness]} out of 4)
+                  <strong>Cleanliness:</strong>{" "}
+                  {cleanlinessDescriptions[review.cleanliness - 1] || "Unknown"}
                 </p>
                 <p>
-                  <strong>Review Text:</strong> {review.feedback || "No comment"}
+                  <strong>Traffic:</strong> {review.traffic}
+                </p>
+                <p>
+                  <strong>Size:</strong> {review.size}
+                </p>
+                <p>
+                  <strong>Accessibility Features:</strong>{" "}
+                  {review.accessibilityFeatures.join(", ") || "None"}
+                </p>
+                <p>
+                  <strong>Feedback:</strong> {review.feedback || "No comment"}
+                </p>
+                <p>
+                  <strong>Created At:</strong>{" "}
+                  {new Date(review.createdAt.seconds * 1000).toLocaleString()}
                 </p>
                 <button
                   className="delete-button"

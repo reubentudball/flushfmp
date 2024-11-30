@@ -4,19 +4,20 @@ import "./WorkManagement.css";
 
 const WorkManagement = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current path for relative navigation
+  const location = useLocation();
 
   const handleNavigation = (path) => {
-    navigate(`${location.pathname}/${path}`); // Append the relative path
+    navigate(`${location.pathname}/${path}`);
   };
 
   return (
     <div className="work-management-container">
-      <h1>Work Management Dashboard</h1>
-      <p>Manage all your tickets, work orders, and employees in one place.</p>
+      <header className="work-management-header">
+        <h1>Work Management Dashboard</h1>
+        <p>Manage all your tickets, work orders, and employees in one place.</p>
+      </header>
 
       <div className="work-management-sections">
-        {/* Tickets Section */}
         <div className="work-section">
           <h2>Tickets</h2>
           <p>Review ticket metrics and create work orders for reported issues.</p>
@@ -28,7 +29,6 @@ const WorkManagement = () => {
           </button>
         </div>
 
-        {/* Work Orders Section */}
         <div className="work-section">
           <h2>Work Orders</h2>
           <p>View, create, update, or delete work orders.</p>
@@ -40,7 +40,6 @@ const WorkManagement = () => {
           </button>
         </div>
 
-        {/* Employees Section */}
         <div className="work-section">
           <h2>Employees</h2>
           <p>Add employees, assign work orders, and track assignments.</p>

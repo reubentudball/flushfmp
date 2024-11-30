@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f9fafc; /* Subtle background for better contrast */
+  background-color: #f9fafc; 
 }
 
 .facilities-header {
@@ -40,7 +40,7 @@
 }
 
 .facility-item:hover {
-  background-color: #eaf3fc; /* Light blue highlight */
+  background-color: #eaf3fc; 
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 

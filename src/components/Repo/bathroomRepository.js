@@ -1,25 +1,33 @@
-import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, GeoPoint,query, where  } from 'firebase/firestore';
 import { db } from '../conf/firebaseConfig';
-import { calculateDistance } from '../Util/util';
+import { calculateDistance,generateGeohash } from '../Util/util';
 
-const createBathroom = async (bathroom, facilityId = null) => {
+const createBathroom = async (bathroom) => {
   try {
-    const bathroomData = {
-      ...bathroom,
-      comments: [],
-      isVerified: false,
-      facilityID: facilityId || 0,
+    const geo = {
+      geopoint: new GeoPoint(
+        bathroom.geo.geopoint.latitude,
+        bathroom.geo.geopoint.longitude
+      ),
+      geohash: generateGeohash(bathroom.geo.geopoint.latitude, bathroom.geo.geopoint.longitude), 
     };
 
-    const bathroomRef = await addDoc(collection(db, 'Bathroom'), bathroomData);
-    console.log('Bathroom added with ID:', bathroomRef.id);
+    const bathroomData = {
+      ...bathroom,
+      geo, 
+      comments: [],
+      updatedAt: new Date().toISOString(), 
+    };
+
+    console.log('Adding bathroom:', bathroomData);
+    const bathroomRef = await addDoc(collection(db, "Bathroom"), bathroomData);
+    console.log("Bathroom added with ID:", bathroomRef.id);
     return { id: bathroomRef.id, ...bathroomData };
   } catch (e) {
-    console.error('Error adding bathroom:', e);
+    console.error("Error adding bathroom:", e);
     throw e;
   }
 };
-
 const createReview = async (bathroomId, review) => {
   try {
     const reviewRef = await addDoc(collection(db, `Bathroom/${bathroomId}/Reviews`), review);
@@ -30,17 +38,21 @@ const createReview = async (bathroomId, review) => {
   }
 };
 
-const getAllBathrooms = async () => {
+const getBathroomsByFacility = async (facilityId) => {
   try {
-    const bathroomsSnapshot = await getDocs(collection(db, 'Bathroom'));
+    const bathroomsQuery = query(
+      collection(db, "Bathroom"),
+      where("facilityID", "==", facilityId) 
+    );
+    const bathroomsSnapshot = await getDocs(bathroomsQuery);
     const bathrooms = bathroomsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    console.log('Fetched bathrooms:', bathrooms);
+    console.log(`Fetched bathrooms for facility ${facilityId}:`, bathrooms);
     return bathrooms;
   } catch (e) {
-    console.error('Error fetching bathrooms:', e);
+    console.error(`Error fetching bathrooms for facility ${facilityId}:`, e);
     throw e;
   }
 };
@@ -148,6 +160,26 @@ const getBathroomById = async (bathroomId) => {
   }
 };
 
+
+const getBathroomsByIds = async (bathroomIds) => {
+  try {
+    const bathrooms = await Promise.all(
+      bathroomIds.map(async (id) => {
+        const bathroomRef = doc(db, "Bathroom", id);
+        const bathroomSnapshot = await getDoc(bathroomRef);
+        return bathroomSnapshot.exists()
+          ? { id: bathroomSnapshot.id, ...bathroomSnapshot.data() }
+          : null;
+      })
+    );
+    return bathrooms.filter((bathroom) => bathroom !== null); // Filter out missing bathrooms
+  } catch (error) {
+    console.error("Error fetching bathrooms by IDs:", error);
+    throw error;
+  }
+};
+
+
 const addComment = async (bathroomId, comment) => {
   try {
     const bathroomRef = doc(db, 'Bathroom', bathroomId);
@@ -219,8 +251,9 @@ const unverifyBathroom = async (bathroomId) => {
 export {
   createBathroom,
   createReview,
-  getAllBathrooms,
+  getBathroomsByFacility,
   getBathroomById,
+  getBathroomsByIds,
   getReviewsFromBathroom,
   updateBathroom,
   deleteBathroom,
