@@ -6,7 +6,7 @@ import toiletIcon from "../../assets/toilet.png";
 import { useUser } from "../context/UserContext";
 
 const Profile = () => {
-  const { user, facility } = useUser(); 
+  const { user, facility } = useUser();
 
   if (!user || !facility) {
     return <div>Loading...</div>;
@@ -14,15 +14,15 @@ const Profile = () => {
 
   const customIcon = L.icon({
     iconUrl: toiletIcon,
-    iconSize: [40, 40], 
-    iconAnchor: [20, 40], 
-    popupAnchor: [0, -40], 
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
   });
 
   const facilityLocation = {
     name: facility.name,
     coordinates: [facility.location.latitude, facility.location.longitude],
-    radius: facility.jurisdictionRadius || 400, 
+    radius: facility.jurisdictionRadius || 400,
   };
 
   return (
@@ -67,10 +67,7 @@ const Profile = () => {
             radius={facilityLocation.radius}
             pathOptions={{ color: "blue", fillOpacity: 0.2 }}
           />
-          <Marker
-            position={facilityLocation.coordinates}
-            icon={customIcon} 
-          >
+          <Marker position={facilityLocation.coordinates} icon={customIcon}>
             <Popup>{facilityLocation.name}</Popup>
           </Marker>
         </MapContainer>

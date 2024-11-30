@@ -1,4 +1,4 @@
-import {doc,getDoc, collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import {doc,getDoc, collection, query, where, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { db } from "../conf/firebaseConfig";
 
 
@@ -75,3 +75,14 @@ const addEmployee = async (employeeData) => {
 };
 
 export { getEmployeesByFacility, addEmployee };
+
+export const assignWorkOrderToEmployee = async (workOrderId, employeeId) => {
+  try {
+    const workOrderRef = doc(db, "WorkOrders", workOrderId);
+    await updateDoc(workOrderRef, { employeeId, status: "assigned" });
+    console.log(`Work order ${workOrderId} assigned to employee ${employeeId}.`);
+  } catch (error) {
+    console.error("Error assigning work order:", error);
+    throw error;
+  }
+};

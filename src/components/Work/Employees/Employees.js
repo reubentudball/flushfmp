@@ -19,7 +19,7 @@ const Employees = () => {
 
   const { facility } = useUser();
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -40,14 +40,13 @@ const Employees = () => {
   }, [facility]);
 
   const handleEmployeeClick = (id) => {
-    console.log("Employee ID:", id);
     navigate(`${location.pathname}/${id}`);
   };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setNewEmployee({ name: "", email: "", phone: "" });
+    setNewEmployee({ firstName: "", lastName: "", email: "", phone: "" });
   };
 
   const handleAddEmployee = async () => {
@@ -76,10 +75,16 @@ const Employees = () => {
       <h2>Employees and Work Orders</h2>
 
       <div className="toggle-buttons">
-        <button onClick={() => setViewType("card")}>
+        <button
+          className={`toggle-button ${viewType === "card" ? "active" : ""}`}
+          onClick={() => setViewType("card")}
+        >
           <FaTh />
         </button>
-        <button onClick={() => setViewType("list")}>
+        <button
+          className={`toggle-button ${viewType === "list" ? "active" : ""}`}
+          onClick={() => setViewType("list")}
+        >
           <FaList />
         </button>
         <button className="add-employee-button" onClick={openModal}>
@@ -94,9 +99,7 @@ const Employees = () => {
             key={index}
             onClick={() => handleEmployeeClick(employee.id)}
           >
-            <h3 style={{ textAlign: "center" }}>
-              {employee.firstName} {employee.lastName}
-            </h3>
+            <h3>{employee.firstName} {employee.lastName}</h3>
             <p>
               <strong>Role:</strong> {employee.role}
             </p>

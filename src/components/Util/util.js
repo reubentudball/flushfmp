@@ -1,3 +1,6 @@
+import ngeohash from "ngeohash";
+
+
 export const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRad = (value) => (value * Math.PI) / 180;
   
@@ -13,3 +16,20 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return R * c; 
   };
   
+  export const generateGeohash = (latitude, longitude, precision = 9) => {
+    console.log("Generating geohash for", latitude, longitude);
+    const geoHash = ngeohash.encode(latitude, longitude, precision);
+    console.log("Generated geohash", geoHash);
+    return geoHash;
+  };
+
+
+  export const formatTimestamp = (timestamp) => {
+    if (!timestamp || !timestamp.seconds) return "Invalid Date";
+  
+    const date = new Date(timestamp.seconds * 1000);
+    return date.toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };

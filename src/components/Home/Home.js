@@ -23,7 +23,7 @@ const Home = () => {
             timestamp: log.timestamp
               ? log.timestamp.toDate().toLocaleString("en-US", {
                   year: "numeric",
-                  month: "long",
+                  month: "short",
                   day: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
@@ -41,30 +41,41 @@ const Home = () => {
 
   return (
     <div className="homepage-container">
-      <h2>Welcome to the Flush Facilities Management Portal</h2>
-      <p>Manage work orders, employees, and restroom facilities with ease.</p>
-
-      <div className="quick-links">
-        <Link to="/admin/dashboard" className="homepage-link">
-          Go to Dashboard
-        </Link>
-        <Link to="/admin/facilities" className="homepage-link">
-          View Facilities
-        </Link>
-        <Link to="/admin/work-management" className="homepage-link">
-          Manage Work
-        </Link>
+      <div className="welcome-section">
+        <h1>Flush Facilities Management Portal</h1>
+        <p>
+          Seamlessly manage work orders, employees, and restroom facilities.
+        </p>
       </div>
 
-      <div className="recent-activity">
-        <h3>Recent Activity</h3>
+      <div className="quick-links-section">
+        <h2>Quick Links</h2>
+        <div className="quick-links">
+          <Link to="/admin/dashboard" className="homepage-link">
+            Dashboard
+          </Link>
+          <Link to="/admin/facilities" className="homepage-link">
+            Facilities
+          </Link>
+          <Link to="/admin/work-management" className="homepage-link">
+            Work Management
+          </Link>
+        </div>
+      </div>
+
+      <div className="recent-activity-section">
+        <h2>Recent Activity</h2>
         {logs.length === 0 ? (
           <p>No recent activity available.</p>
         ) : (
-          <ul>
+          <ul className="recent-activity-list">
             {logs.map((log, index) => (
-              <li key={index}>
-                <strong>{log.timestamp}</strong>: {log.actorName} {log.action} {log.targetType} "{log.targetName}"
+              <li key={index} className="recent-activity-item">
+                <span className="timestamp">{log.timestamp}</span> -{" "}
+                <span className="actor-name">{log.actorName}</span>{" "}
+                <span className="action">{log.action}</span>{" "}
+                <span className="target-type">{log.targetType}</span> "
+                <span className="target-name">{log.targetName}</span>"
               </li>
             ))}
           </ul>

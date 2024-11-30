@@ -15,7 +15,8 @@ import {
 } from "../Repo/bathroomRepository";
 import { logActivity } from "../Repo/LogRepository"; 
 import { useUser } from "../context/UserContext";
-import { calculateDistance } from "../Util/util";
+import { calculateDistance, generateGeohash } from "../Util/util";
+import { GeoPoint } from "firebase/firestore";
 
 const unverifiedMarkerIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
@@ -71,7 +72,7 @@ const Facilities = () => {
   }, [facility]);
 
   const handleFacilityClick = (bathroom) => {
-    navigate(`/admin/facilities/${bathroom.title.toLowerCase().replace(/ /g, "-")}`, {
+    navigate(`/admin/facilities/${bathroom.id.toLowerCase().replace(/ /g, "-")}`, {
       state: { facilityId: bathroom.id },
     });
   };
@@ -123,6 +124,12 @@ const Facilities = () => {
   };
   
   const handleDeleteBathroom = async (bathroom) => {
+
+    if (!window.confirm(`Are you sure you want to delete the bathroom "${bathroom.title}"? This action cannot be undone.`)) {
+      return;
+    }
+  
+
     try {
       await deleteBathroom(bathroom.id);
       setFacilities((prev) => prev.filter((b) => b.id !== bathroom.id));
@@ -149,11 +156,27 @@ const Facilities = () => {
         return;
       }
   
-      const addedBathroom = await createBathroom({
-        ...newBathroom,
-        isVerified: true,
+      const geohash = generateGeohash(latitude, longitude);
+      const bathroomData = {
+        title: newBathroom.title,
+        directions: newBathroom.directions,
+        geo: {
+          geopoint: new GeoPoint(parseFloat(latitude), parseFloat(longitude)), 
+          geohash: geohash, 
+        },
         facilityID: facility.facilityId,
-      });
+        ownerID: user.uid,
+        isVerified: true,
+        healthScore: 0,
+        cleanlinessScore: 0,
+        trafficScore: 0,
+        accessibilityScore: 0,
+        comments: [],
+        reviews: null,
+        updatedAt: new Date().toISOString(),
+      };
+  
+      const addedBathroom = await createBathroom(bathroomData);
       setFacilities((prev) => [...prev, addedBathroom]);
       setIsModalOpen(false);
       setNewBathroom({ title: "", directions: "", geo: { geopoint: { latitude: "", longitude: "" } } });
@@ -221,7 +244,7 @@ const Facilities = () => {
 
   return (
     <div className="facilities-container">
-      <h2>Facilities Management</h2>
+      <h2 className="facilities-title">Facilities Management</h2>
       <button className="add-bathroom-button" onClick={openModal}>
         Add Bathroom
       </button>
