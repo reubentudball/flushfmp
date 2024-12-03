@@ -1,7 +1,8 @@
+require("dotenv").config();
 const axios = require("axios");
 
 const analyzeSentiment = async (text) => {
-  const apiKey = "AIzaSyB5UkVsme5DhJOxGPCpc2SysCUueNYeGIY"; // Use your API key
+  const apiKey = process.env.GOOGLE_API_KEY;
   const url = `https://language.googleapis.com/v1/documents:analyzeSentiment?key=${apiKey}`;
 
   const body = {
