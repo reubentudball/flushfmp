@@ -4,7 +4,7 @@ import { fetchWorkOrderById } from "../../../Repo/workOrderRepository";
 import "./WorkOrder.css";
 
 const WorkOrder = () => {
-  const { workOrderId } = useParams(); 
+  const { workOrderId } = useParams();
   const navigate = useNavigate();
   const [workOrder, setWorkOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +39,9 @@ const WorkOrder = () => {
     return <div>Work order not found.</div>;
   }
 
+  const capitalizeStatus = (status) =>
+    status.charAt(0).toUpperCase() + status.slice(1);
+
   return (
     <div className="work-order-container">
       <button className="work-order-back-button" onClick={() => navigate(-1)}>
@@ -46,8 +49,26 @@ const WorkOrder = () => {
       </button>
       <h2 className="work-order-title">{workOrder.title}</h2>
       <p className="work-order-detail">
-        <strong>Status:</strong> {workOrder.status}
+        <strong>Status:</strong> {capitalizeStatus(workOrder.status)}
       </p>
+      {workOrder.status.toLowerCase() === "assigned" && (
+        <div className="work-order-section">
+          <h3 className="work-order-section-title">Assigned Employees</h3>
+          {workOrder.employees?.length > 0 ? (
+            <ul className="work-order-list">
+              {workOrder.employees.map((employee) => (
+                <li key={employee.id} className="work-order-list-item">
+                  <strong>{employee.name}</strong>
+                  <p>Employee ID: {employee.id}</p>
+                  <p>Role: {employee.role || "Not specified"}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="work-order-detail">No employees assigned to this work order.</p>
+          )}
+        </div>
+      )}
       <p className="work-order-detail">
         <strong>Description:</strong> {workOrder.description || "No description provided"}
       </p>
@@ -95,7 +116,6 @@ const WorkOrder = () => {
       </div>
     </div>
   );
-  
 };
 
 export default WorkOrder;

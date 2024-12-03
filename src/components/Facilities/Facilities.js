@@ -72,8 +72,8 @@ const Facilities = () => {
   }, [facility]);
 
   const handleFacilityClick = (bathroom) => {
-    navigate(`/admin/facilities/${bathroom.id.toLowerCase().replace(/ /g, "-")}`, {
-      state: { facilityId: bathroom.id },
+    navigate(`/admin/facilities/${bathroom.id}`, {
+      state: {bathroom: bathroom },
     });
   };
 

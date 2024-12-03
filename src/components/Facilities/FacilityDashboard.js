@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Line, Pie } from "react-chartjs-2";
 import { useLocation } from "react-router-dom";
+import { QRCodeCanvas } from 'qrcode.react';
 import "./FacilityDashboard.css";
 import {
   getBathroomById,
@@ -8,16 +9,20 @@ import {
   deleteComment,
   deleteReview,
 } from "../Repo/bathroomRepository";
+import { useUser } from "../context/UserContext";
+import flushIcon from "../../assets/toilet.png";
 
-const FacilityDashboard = ({ facilityName }) => {
+const FacilityDashboard = () => {
+  const {facility} = useUser();
   const [cleanlinessData, setCleanlinessData] = useState(null);
   const [commentSentimentData, setCommentSentimentData] = useState(null);
   const [facilityNotFound, setFacilityNotFound] = useState(false);
   const [comments, setComments] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   const location = useLocation();
-  const facilityId = location.state?.facilityId;
+  const bathroom = location.state?.bathroom;
 
   const cleanlinessDescriptions = [
     "Very Messy",
@@ -29,21 +34,14 @@ const FacilityDashboard = ({ facilityName }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!facilityId) {
+      if (!bathroom) {
         setFacilityNotFound(true);
         return;
       }
-
       try {
-        const facility = await getBathroomById(facilityId);
-        if (!facility) {
-          setFacilityNotFound(true);
-          return;
-        }
+        setComments(bathroom.comments || []);
 
-        setComments(facility.comments || []);
-
-        const reviewsData = await getReviewsFromBathroom(facilityId);
+        const reviewsData = await getReviewsFromBathroom(bathroom.id);
         setReviews(reviewsData);
 
         const timestamps = reviewsData.map((review) =>
@@ -75,7 +73,7 @@ const FacilityDashboard = ({ facilityName }) => {
           negative: 0,
         };
 
-        facility.comments.forEach((comment) => {
+        bathroom.comments.forEach((comment) => {
           const { sentimentScore } = comment;
           if (sentimentScore > 0.2) {
             sentimentCounts.positive++;
@@ -110,13 +108,18 @@ const FacilityDashboard = ({ facilityName }) => {
             },
           ],
         });
+
+        const lightweightReviewUrl = `${window.location.origin}/submit-review/${bathroom.id}`;
+
+        setQrCodeUrl(lightweightReviewUrl);
+
       } catch (error) {
         console.error("Error fetching data", error);
       }
     };
 
     fetchData();
-  }, [facilityId]);
+  }, [bathroom, bathroom.comments]);
 
   if (facilityNotFound) {
     return <div>Facility not found. Please check the facility ID.</div>;
@@ -133,7 +136,7 @@ const FacilityDashboard = ({ facilityName }) => {
           (_, index) => index !== commentIndex
         );
         setComments(updatedComments);
-        await deleteComment(facilityId, commentIndex);
+        await deleteComment(bathroom.id, commentIndex);
       } catch (error) {
         console.error("Error deleting comment:", error);
       }
@@ -147,16 +150,114 @@ const FacilityDashboard = ({ facilityName }) => {
           (_, index) => index !== reviewIndex
         );
         setReviews(updatedReviews);
-        await deleteReview(facilityId, reviewIndex);
+        await deleteReview(bathroom.id, reviewIndex);
       } catch (error) {
         console.error("Error deleting review:", error);
       }
     }
   };
 
+  const handlePrint = () => {
+    const qrCodeCanvas = document.querySelector('.qr-code canvas');
+    const qrCodeDataUri = qrCodeCanvas.toDataURL('image/png');
+  
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              text-align: center;
+            }
+            .poster {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: space-around;
+              height: 100vh;
+              box-sizing: border-box;
+              padding: 40px;
+              background-color: #f9f9f9;
+            }
+            .branding {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              font-size: 2rem;
+              font-weight: bold;
+              color: #007bff;
+            }
+            .branding img {
+              width: 50px;
+              height: 50px;
+            }
+            .tagline {
+              font-size: 1.5rem;
+              margin: 20px 0;
+              color: #555;
+            }
+            .qr-code img {
+              margin: 20px auto;
+              width: 200px;
+              height: 200px;
+            }
+            .download-links {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+              margin-top: 20px;
+            }
+            .download-text {
+              font-size: 1.2rem;
+              font-weight: bold;
+              color: #007bff;
+            }
+            .placeholder {
+              width: 120px;
+              height: 50px;
+              background-color: #e0e0e0;
+              border-radius: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1rem;
+              color: #555;
+              box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            }
+          </style>
+        </head>
+        <body>
+          <div class="poster">
+            <div class="branding">
+              <img src="${flushIcon}" alt="Flush Logo" />
+              <span>${bathroom.title}</span>
+            </div>
+            <div class="tagline">Leave Your Review Today!</div>
+            <div class="qr-code">
+              <img src="${qrCodeDataUri}" alt="QR Code" />
+            </div>
+            <div class="download-links">
+              <div class="download-text">Download the official Flush app today!</div>
+              <div class="placeholder">iOS</div>
+              <div class="placeholder">Play Store</div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+  
+
   return (
     <div className="facility-dashboard-container">
-      <h2>{facilityName} Dashboard</h2>
+      <h2>{bathroom.title} Dashboard</h2>
       <div className="chart-grid">
         <div className="chart-container">
           <h3>Cleanliness Scores Over Time</h3>
@@ -235,6 +336,16 @@ const FacilityDashboard = ({ facilityName }) => {
             ))}
           </ul>
         )}
+      </div>
+
+      <div className="qr-code-section">
+        <h3>Manage Reviews</h3>
+        <div className="qr-code">
+          <QRCodeCanvas value={qrCodeUrl} size={200} />
+        </div>
+        <button className="print-poster-button" onClick={handlePrint}>
+          Print QR Code Poster
+        </button>
       </div>
     </div>
   );
