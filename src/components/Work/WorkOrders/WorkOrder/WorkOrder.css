@@ -1,0 +1,65 @@
+.work-order-container {
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.work-order-back-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.work-order-back-button:hover {
+  background-color: #0056b3;
+}
+
+.work-order-title {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.work-order-detail {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.work-order-section {
+  margin-top: 20px;
+}
+
+.work-order-section-title {
+  font-size: 20px;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.work-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.work-order-list-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}

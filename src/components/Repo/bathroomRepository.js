@@ -1,38 +1,87 @@
-import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, GeoPoint,query, where  } from 'firebase/firestore';
 import { db } from '../conf/firebaseConfig';
+import { calculateDistance,generateGeohash } from '../Util/util';
 
 const createBathroom = async (bathroom) => {
   try {
-    const bathroomRef = await addDoc(collection(db, "Bathroom"), {
+    const geo = {
+      geopoint: new GeoPoint(
+        bathroom.geo.geopoint.latitude,
+        bathroom.geo.geopoint.longitude
+      ),
+      geohash: generateGeohash(bathroom.geo.geopoint.latitude, bathroom.geo.geopoint.longitude), 
+    };
+
+    const bathroomData = {
       ...bathroom,
-      comments: [],  
-    });
-    console.log('Bathroom added with ID:', bathroomRef.id);
+      geo, 
+      comments: [],
+      updatedAt: new Date().toISOString(), 
+    };
+
+    console.log('Adding bathroom:', bathroomData);
+    const bathroomRef = await addDoc(collection(db, "Bathroom"), bathroomData);
+    console.log("Bathroom added with ID:", bathroomRef.id);
+    return { id: bathroomRef.id, ...bathroomData };
   } catch (e) {
-    console.error('Error adding bathroom:', e);
+    console.error("Error adding bathroom:", e);
+    throw e;
   }
 };
-
 const createReview = async (bathroomId, review) => {
   try {
     const reviewRef = await addDoc(collection(db, `Bathroom/${bathroomId}/Reviews`), review);
     console.log('Review added with ID:', reviewRef.id);
   } catch (e) {
     console.error('Error adding review:', e);
+    throw e;
   }
 };
 
-const getAllBathrooms = async () => {
+const getBathroomsByFacility = async (facilityId) => {
+  try {
+    const bathroomsQuery = query(
+      collection(db, "Bathroom"),
+      where("facilityID", "==", facilityId) 
+    );
+    const bathroomsSnapshot = await getDocs(bathroomsQuery);
+    const bathrooms = bathroomsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log(`Fetched bathrooms for facility ${facilityId}:`, bathrooms);
+    return bathrooms;
+  } catch (e) {
+    console.error(`Error fetching bathrooms for facility ${facilityId}:`, e);
+    throw e;
+  }
+};
+
+const getBathroomsWithinRadius = async (facilityCoords, radius) => {
   try {
     const bathroomsSnapshot = await getDocs(collection(db, 'Bathroom'));
     const bathrooms = bathroomsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    console.log('Fetched bathrooms:', bathrooms);
-    return bathrooms;
+
+    const filteredBathrooms = bathrooms.filter((bathroom) => {
+      if (!bathroom.geo?.geopoint) return false;
+
+      const distance = calculateDistance(
+        facilityCoords._lat,
+        facilityCoords._long,
+        bathroom.geo.geopoint.latitude,
+        bathroom.geo.geopoint.longitude
+      );
+
+      return distance <= radius;
+    });
+
+    console.log(`Filtered ${filteredBathrooms.length} bathrooms within radius.`);
+    return filteredBathrooms;
   } catch (e) {
-    console.error('Error fetching bathrooms:', e);
+    console.error('Error fetching bathrooms within radius:', e);
     throw e;
   }
 };
@@ -111,13 +160,33 @@ const getBathroomById = async (bathroomId) => {
   }
 };
 
+
+const getBathroomsByIds = async (bathroomIds) => {
+  try {
+    const bathrooms = await Promise.all(
+      bathroomIds.map(async (id) => {
+        const bathroomRef = doc(db, "Bathroom", id);
+        const bathroomSnapshot = await getDoc(bathroomRef);
+        return bathroomSnapshot.exists()
+          ? { id: bathroomSnapshot.id, ...bathroomSnapshot.data() }
+          : null;
+      })
+    );
+    return bathrooms.filter((bathroom) => bathroom !== null); 
+  } catch (error) {
+    console.error("Error fetching bathrooms by IDs:", error);
+    throw error;
+  }
+};
+
+
 const addComment = async (bathroomId, comment) => {
   try {
     const bathroomRef = doc(db, 'Bathroom', bathroomId);
     const bathroomSnap = await getDoc(bathroomRef);
     if (bathroomSnap.exists()) {
       const currentComments = bathroomSnap.data().comments || [];
-      const updatedComments = [...currentComments, comment]; 
+      const updatedComments = [...currentComments, comment];
       await updateDoc(bathroomRef, { comments: updatedComments });
       console.log('Comment added successfully');
     } else {
@@ -136,7 +205,7 @@ const deleteComment = async (bathroomId, commentIndex) => {
     if (bathroomSnap.exists()) {
       const currentComments = bathroomSnap.data().comments || [];
       if (commentIndex >= 0 && commentIndex < currentComments.length) {
-        const updatedComments = currentComments.filter((_, index) => index !== commentIndex); 
+        const updatedComments = currentComments.filter((_, index) => index !== commentIndex);
         await updateDoc(bathroomRef, { comments: updatedComments });
         console.log('Comment deleted successfully');
       } else {
@@ -151,16 +220,48 @@ const deleteComment = async (bathroomId, commentIndex) => {
   }
 };
 
+const verifyBathroom = async (bathroomId, facilityId) => {
+  try {
+    const bathroomRef = doc(db, 'Bathroom', bathroomId);
+    await updateDoc(bathroomRef, {
+      isVerified: true,
+      facilityID: facilityId,
+    });
+    console.log(`Bathroom ${bathroomId} verified successfully`);
+  } catch (e) {
+    console.error('Error verifying bathroom:', e);
+    throw e;
+  }
+};
+
+const unverifyBathroom = async (bathroomId) => {
+  try {
+    const bathroomRef = doc(db, 'Bathroom', bathroomId);
+    await updateDoc(bathroomRef, {
+      isVerified: false,
+      facilityID: null,
+    });
+    console.log(`Bathroom ${bathroomId} unverified successfully.`);
+  } catch (e) {
+    console.error('Error unverifying bathroom:', e);
+    throw e;
+  }
+};
+
 export {
   createBathroom,
   createReview,
-  getAllBathrooms,
+  getBathroomsByFacility,
   getBathroomById,
+  getBathroomsByIds,
   getReviewsFromBathroom,
   updateBathroom,
   deleteBathroom,
   updateReview,
   deleteReview,
-  addComment,    
-  deleteComment,  
+  addComment,
+  deleteComment,
+  getBathroomsWithinRadius,
+  verifyBathroom,
+  unverifyBathroom,
 };

@@ -1,0 +1,125 @@
+.employee-info-page {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.employee-info-header {
+  margin-bottom: 20px;
+}
+
+.employee-info-header-title {
+  font-size: 24px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.employee-info-header-phone {
+  font-size: 16px;
+  color: #555;
+}
+
+.work-order-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item-label {
+  margin-bottom: 5px;
+  color: #495057;
+  font-size: 14px;
+}
+
+.stat-item-value {
+  font-size: 20px;
+  color: #333;
+}
+
+.work-order-section-title {
+  margin-top: 30px;
+  color: #2c3e50;
+}
+
+.work-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.employee-info-work-order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #f1f3f5, #ffffff);
+  box-shadow: 4px 4px 8px #d1d9e0, -4px -4px 8px #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.employee-info-work-order-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.5);
+}
+
+.employee-info-work-order-item-description {
+  font-size: 14px;
+  color: #555;
+}
+
+.assign-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.assign-button:hover {
+  background-color: #218838;
+}
+
+.assign-button:active {
+  background-color: #1e7e34;
+}
+
+.error-message {
+  font-size: 16px;
+  color: red;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .employee-info-page {
+    padding: 20px;
+  }
+
+  .work-order-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stat-item {
+    padding: 15px;
+  }
+}
