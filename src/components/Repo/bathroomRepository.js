@@ -172,7 +172,7 @@ const getBathroomsByIds = async (bathroomIds) => {
           : null;
       })
     );
-    return bathrooms.filter((bathroom) => bathroom !== null); // Filter out missing bathrooms
+    return bathrooms.filter((bathroom) => bathroom !== null); 
   } catch (error) {
     console.error("Error fetching bathrooms by IDs:", error);
     throw error;

@@ -1,0 +1,195 @@
+.submit-review-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .submit-review-logo {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .submit-review-logo img {
+    width: 120px;
+    height: auto;
+  }
+  
+  .submit-review-header {
+    font-size: 2rem;
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .submit-review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .submit-review-label {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .submit-review-input,
+  .submit-review-textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .submit-review-fieldset {
+    border: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .submit-review-accessibility-feature {
+    margin-bottom: 10px;
+  }
+  
+  .submit-review-button {
+    width: 100%;
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-review-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .submit-review-button:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+  
+  .submit-review-success-message,
+  .submit-review-error-message {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  .submit-review-success-message {
+    color: #28a745;
+  }
+  
+  .submit-review-error-message {
+    color: #dc3545;
+  }
+  
+  .submit-review-app-promotion {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .submit-review-app-promotion-header {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .submit-review-app-promotion-description {
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .submit-review-app-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .submit-review-app-button {
+    flex: 1 0 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-review-app-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .submit-review-app-button-ios {
+    background-color: #007aff;
+  }
+  
+  .submit-review-app-button-android {
+    background-color: #3ddc84;
+  }
+
+  
+  @media (max-width: 600px) {
+    .submit-review-header {
+      font-size: 1.5rem;
+    }
+  
+    .submit-review-form {
+      gap: 10px;
+    }
+  
+    .submit-review-app-buttons {
+      gap: 8px;
+    }
+  
+    .submit-review-app-button {
+      flex: 1 0 100%;
+      max-width: 100%;
+    }
+  }
+  
+  .rating-bar {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .rating-item {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  
+  .rating-item.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+  }
+  
+  .rating-item:hover {
+    background-color: #0056b3;
+    color: #fff;
+  }
+  

@@ -17,6 +17,7 @@ import WorkOrders from "./components/Work/WorkOrders/WorkOrders";
 import Tickets from "./components/Work/Tickets/Tickets";
 import CreateWorkOrder from "./components/Work/WorkOrders/CreateWorkOrder/CreateWorkOrder";
 import WorkOrder from "./components/Work/WorkOrders/WorkOrder/WorkOrder";
+import SubmitReview from "./components/Public/SubmitReview/SubmitReview";
 
 import "leaflet/dist/leaflet.css";
 import toiletIcon from "./assets/toilet-white.png";
@@ -35,6 +36,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/submit-review/:bathroomId" element={<SubmitReview />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/admin" element={<AdminPage />}>
