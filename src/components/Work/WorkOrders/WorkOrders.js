@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { fetchWorkOrders } from "../../Repo/workOrderRepository";
+import { formatTimestamp, capitalizeStatus } from "../../Util/util";
 import "./WorkOrders.css";
 
 const WorkOrders = () => {
@@ -67,8 +68,8 @@ const WorkOrders = () => {
     groupAndSortWorkOrders(workOrders, groupBy, newSortOption);
   };
 
-  const handleWorkOrderClick = (id) => {
-    navigate(`${location.pathname}/${id}`);
+  const handleWorkOrderClick = (order) => {
+    navigate(`${location.pathname}/${order.id}`, { state: { order } });
   };
 
   return (
@@ -106,17 +107,17 @@ const WorkOrders = () => {
         <div className="work-orders-grouped">
           {Object.entries(groupedWorkOrders).map(([groupName, orders]) => (
             <div key={groupName} className="work-order-group">
-              <h3 className="group-title">{groupName}</h3>
+              <h3 className="group-title">{capitalizeStatus(groupName)}</h3>
               <div className="work-orders-list">
                 {orders.map((order) => (
                   <div
                     key={order.id}
                     className="work-order-item"
-                    onClick={() => handleWorkOrderClick(order.id)}
+                    onClick={() => handleWorkOrderClick(order)}
                   >
                     <div className="work-order-item-title">{order.title}</div>
                     <div className="work-order-item-detail">
-                      <strong>Status:</strong> {order.status}
+                      <strong>Status:</strong> {capitalizeStatus(order.status)}
                     </div>
                     <div className="work-order-item-detail">
                       <strong>Description:</strong>{" "}
@@ -124,7 +125,7 @@ const WorkOrders = () => {
                     </div>
                     <div className="work-order-item-detail">
                       <strong>Created At:</strong>{" "}
-                      {new Date(order.createdAt).toLocaleString() || "N/A"}
+                      {formatTimestamp(order.createdAt) || "N/A"}
                     </div>
                   </div>
                 ))}
