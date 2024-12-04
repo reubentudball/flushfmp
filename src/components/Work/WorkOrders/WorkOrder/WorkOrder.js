@@ -1,46 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, {useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchWorkOrderById } from "../../../Repo/workOrderRepository";
+import { useLocation } from "react-router-dom";
+import {getEmployeeById} from "../../../Repo/employeeRepository";
+import {capitalizeStatus} from "../../../Util/util";
 import "./WorkOrder.css";
 
 const WorkOrder = () => {
-  const { workOrderId } = useParams();
+  const location = useLocation();
+  const [workOrder, setWorkOrder] = useState(location.state?.order || null); 
   const navigate = useNavigate();
-  const [workOrder, setWorkOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [employee, setEmployee] = useState(null);
 
   useEffect(() => {
-    const loadWorkOrder = async () => {
+    const loadEmployee = async () => {
+      if (!workOrder?.employeeId) {  
+        setLoading(false);
+        return;
+      }
       try {
-        console.log("fetching work order by id", workOrderId);
-        const data = await fetchWorkOrderById(workOrderId);
-        setWorkOrder(data);
+        const data = await getEmployeeById(workOrder.employeeId);
+        setEmployee(data);
       } catch (error) {
-        console.error("Error fetching work order:", error);
-        setError("Failed to load work order. Please try again later.");
+        console.log("Error fetching employee: " + error.message);
       } finally {
         setLoading(false);
       }
     };
+    loadEmployee();
+  }, [workOrder?.employeeId]);
 
-    loadWorkOrder();
-  }, [workOrderId]);
 
   if (loading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
   }
 
   if (!workOrder) {
     return <div>Work order not found.</div>;
   }
 
-  const capitalizeStatus = (status) =>
-    status.charAt(0).toUpperCase() + status.slice(1);
 
   return (
     <div className="work-order-container">
@@ -54,15 +52,13 @@ const WorkOrder = () => {
       {workOrder.status.toLowerCase() === "assigned" && (
         <div className="work-order-section">
           <h3 className="work-order-section-title">Assigned Employees</h3>
-          {workOrder.employees?.length > 0 ? (
+          {employee ? (
             <ul className="work-order-list">
-              {workOrder.employees.map((employee) => (
                 <li key={employee.id} className="work-order-list-item">
-                  <strong>{employee.name}</strong>
+                  <strong>{employee.firstName} {employee.lastName}</strong>
                   <p>Employee ID: {employee.id}</p>
                   <p>Role: {employee.role || "Not specified"}</p>
                 </li>
-              ))}
             </ul>
           ) : (
             <p className="work-order-detail">No employees assigned to this work order.</p>
