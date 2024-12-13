@@ -7,7 +7,7 @@
   }
   
   .employee-header {
-    background-color: #2d3436; 
+    background-color: #333; 
     color: #fff;
     text-align: center;
     padding: 30px 20px;
@@ -97,14 +97,7 @@
     background-color: #ac2925;
   }
   
-  .employee-header {
-    position: relative;
-    background-color: #1d3557;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
+
   
 
 
