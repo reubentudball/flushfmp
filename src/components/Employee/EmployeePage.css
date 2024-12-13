@@ -51,28 +51,30 @@
   .employee-nav-tab {
     flex: 1;
     text-align: center;
-    padding: 12px 0;
+    padding: 15px 0;
     font-size: 1rem;
-    font-weight: 600;
-    color: #636e72; 
-    background: none;
+    font-weight: bold;
+    color: #fff; 
+    background-color: #333; 
     border: none;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 0 0 15px 15px;
     margin: 0 10px;
     transition: all 0.3s ease;
-  }
-  
-  .employee-nav-tab.active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.employee-nav-tab.active {
     color: #ffffff;
-    background-color: #0984e3;
-    box-shadow: 0 4px 8px rgba(9, 132, 227, 0.3);
-  }
-  
-  .employee-nav-tab:hover {
-    background-color: rgba(9, 132, 227, 0.2); 
-    color: #0984e3;
-  }
+    background-color: #555;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
+}
+
+.employee-nav-tab:hover {
+    background-color: #444; 
+    color: #ffffff;
+}
+
   
   .employee-logout-button {
     position: absolute;
