@@ -3,59 +3,53 @@ import { db } from "../conf/firebaseConfig";
 
 export const fetchReportsByFacility = async (facilityId) => {
   try {
-    const bathroomCollection = collection(db, "Bathroom");
-
     const bathroomQuery = query(
-      bathroomCollection,
+      collection(db, "Bathroom"),
       where("facilityID", "==", facilityId)
     );
-
     const bathroomSnapshot = await getDocs(bathroomQuery);
 
     const reportsByBathroom = {};
 
-    for (const bathroomDoc of bathroomSnapshot.docs) {
-      const bathroomID = bathroomDoc.id;
-      const bathroomName = bathroomDoc.data().title || "Unnamed Bathroom";
+    await Promise.all(
+      bathroomSnapshot.docs.map(async (bathroomDoc) => {
+        const bathroomID = bathroomDoc.id;
+        const bathroomData = bathroomDoc.data();
+        const reportsCollection = collection(db, `Bathroom/${bathroomID}/Reports`);
+        const reportsSnapshot = await getDocs(reportsCollection);
 
-      const reportsCollection = collection(bathroomDoc.ref, "Reports");
-      const reportsSnapshot = await getDocs(reportsCollection);
+        const tickets = reportsSnapshot.empty
+          ? [] 
+          : await Promise.all(
+              reportsSnapshot.docs.map(async (reportDoc) => {
+                const report = reportDoc.data();
+                const userSnapshot = await getDoc(doc(db, "User", report.userId));
+                return {
+                  id: reportDoc.id,
+                  category: report.category,
+                  description: report.description,
+                  timestamp: report.timestamp?.toDate() || null,
+                  userId: userSnapshot.exists()
+                    ? `${userSnapshot.data().firstName} ${userSnapshot.data().lastName}`
+                    : "Unknown User",
+                };
+              })
+            );
 
-      const tickets = await Promise.all(
-        reportsSnapshot.docs.map(async (reportDoc) => {
-          const report = reportDoc.data();
-
-          const userRef = doc(db, "User", report.userId);
-          const userSnapshot = await getDoc(userRef);
-
-          let userName = "Unknown User";
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.data();
-            userName = `[${userData.lastName}, ${userData.firstName} - ${userData.username}]`;
-          }
-
-          return {
-            id: reportDoc.id, 
-            category: report.category,
-            description: report.description,
-            timestamp: report.timestamp.toDate(),
-            userId: userName,
-          };
-        })
-      );
-
-      reportsByBathroom[bathroomID] = {
-        name: bathroomName,
-        tickets,
-      };
-    }
+        reportsByBathroom[bathroomID] = {
+          name: bathroomData.title || "Unnamed Bathroom",
+          tickets,
+        };
+      })
+    );
 
     return reportsByBathroom;
   } catch (error) {
-    console.error("Error fetching reports from Firestore:", error);
+    console.error("Error fetching reports by facility:", error);
     throw error;
   }
 };
+
 
 export const fetchOpenTickets = async () => {
   try {
