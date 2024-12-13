@@ -17,65 +17,59 @@
   font-weight: 600;
 }
 
-.facilities-list {
-  list-style: none;
-  padding: 0;
+.facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  gap: 20px;
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 20px auto; 
+  box-sizing: border-box; 
+  padding: 0;
+  list-style: none;
 }
 
-.facility-item {
+
+.facility-card {
   background-color: #fff;
-  padding: 20px;
-  margin: 15px 0;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  padding: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
-.facility-item:hover {
-  background-color: #eaf3fc; 
+.facility-card:hover {
+  transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.facility-info {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
 .facility-info h3 {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #222;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
 }
 
 .facility-info p {
   margin: 5px 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #555;
 }
 
-.facility-info p:last-child {
-  margin-top: 10px;
-  font-weight: bold;
+.facility-info p strong {
+  color: #222;
 }
 
 .facility-actions {
+  margin-top: 15px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: space-between;
 }
 
 .facility-actions button {
-  padding: 10px 15px;
+  padding: 8px 12px;
   font-size: 0.9rem;
   border: none;
   border-radius: 5px;
@@ -83,23 +77,33 @@
   transition: background-color 0.3s ease;
 }
 
-.facility-actions button.verify-btn {
+.facility-actions .verify-btn {
   background-color: #28a745;
   color: #fff;
 }
 
-.facility-actions button.verify-btn:hover {
+.facility-actions .verify-btn:hover {
   background-color: #218838;
 }
 
-.facility-actions button.delete-btn {
+.facility-actions .unverify-btn {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.facility-actions .unverify-btn:hover {
+  background-color: #e0a800;
+}
+
+.facility-actions .delete-btn {
   background-color: #dc3545;
   color: #fff;
 }
 
-.facility-actions button.delete-btn:hover {
+.facility-actions .delete-btn:hover {
   background-color: #c82333;
 }
+
 
 .facility-actions button.disabled {
   background-color: #e0e0e0;

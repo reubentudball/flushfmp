@@ -248,55 +248,58 @@ const Facilities = () => {
       <button className="add-bathroom-button" onClick={openModal}>
         Add Bathroom
       </button>
-      <ul className="facilities-list">
-        {facilities.map((bathroom, index) => (
-          <li
-            key={index}
-            className="facility-item"
-            onClick={() => handleFacilityClick(bathroom)}
+      <ul className="facilities-grid">
+  {facilities.map((bathroom, index) => (
+    <li
+      key={index}
+      className="facility-card"
+      onClick={() => handleFacilityClick(bathroom)}
+    >
+      <div className="facility-info">
+        <h3>{bathroom.title}</h3>
+        <p>Directions: {bathroom.directions}</p>
+        <p>Type: <strong>{bathroom.bathroomType || "Unknown"}</strong></p>
+        <p>Access: <strong>{bathroom.accessType || "Unknown"}</strong></p>
+        <p>
+          <FaCommentDots /> {bathroom.comments?.length || 0} Comments
+        </p>
+      </div>
+      <div className="facility-actions">
+        {bathroom.isVerified ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUnverifyBathroom(bathroom);
+            }}
+            className="unverify-btn"
           >
-            <div className="facility-info">
-              <h3>{bathroom.title}</h3>
-              <p>Directions: {bathroom.directions}</p>
-              <p>
-                Location: {bathroom.geo.geopoint.latitude}, {bathroom.geo.geopoint.longitude}
-              </p>
-              <p>
-                <FaCommentDots /> {bathroom.comments?.length || 0} Comments
-              </p>
-              <div className="facility-actions">
-                {bathroom.isVerified ? (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleUnverifyBathroom(bathroom); 
-                    }}
-                  >
-                    Unverify
-                  </button>
-                ) : (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleVerifyBathroom(bathroom);
-                    }}
-                  >
-                    Verify
-                  </button>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteBathroom(bathroom); 
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            Unverify
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleVerifyBathroom(bathroom);
+            }}
+            className="verify-btn"
+          >
+            Verify
+          </button>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteBathroom(bathroom);
+          }}
+          className="delete-btn"
+        >
+          Delete
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
+
 
       <div className="map-container">
         <MapContainer
