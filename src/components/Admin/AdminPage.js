@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navigation from "../Navigation/Navigation";
+import Navigation from "./Navigation/Navigation";
 import "./AdminPage.css";
 import { Outlet } from "react-router-dom";
 

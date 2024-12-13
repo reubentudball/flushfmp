@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, query, where, doc, getDoc} from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where, doc, getDoc, updateDoc} from "firebase/firestore";
 import { db } from "../conf/firebaseConfig";
 import { getBathroomsByIds } from "./bathroomRepository";
 import { fetchTicketsByIds } from "./ticketRepository";
@@ -97,6 +97,31 @@ export const getOpenWorkOrders = async () => {
     }));
   } catch (error) {
     console.error("Error fetching open work orders:", error);
+    throw error;
+  }
+};
+
+export const updateWorkOrderStatus = async (workOrderId, status) => {
+  try {
+    const workOrderRef = doc(db, "WorkOrders", workOrderId);
+    await updateDoc(workOrderRef, { status });
+  } catch (error) {
+    console.error("Error updating work order status:", error);
+    throw error;
+  }
+};
+
+export const fetchWorkOrdersByEmployee = async (employeeId) => {
+  try {
+    const q = query(collection(db, "WorkOrders"), where("employeeId", "==", employeeId));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error fetching work orders by employee:", error);
     throw error;
   }
 };

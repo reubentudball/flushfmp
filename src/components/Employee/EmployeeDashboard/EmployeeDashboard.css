@@ -1,0 +1,71 @@
+.employee-dashboard {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.employee-dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.employee-dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.employee-dashboard-description {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.employee-dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.employee-dashboard-chart-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.employee-dashboard-chart-card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.employee-dashboard-chart-wrapper {
+  width: 100%;
+  max-width: 400px;
+  height: 300px;
+}
+
+@media (max-width: 768px) {
+  .employee-dashboard-title {
+    font-size: 1.8rem;
+  }
+
+  .employee-dashboard-description {
+    font-size: 1rem;
+  }
+
+  .employee-dashboard-chart-card-title {
+    font-size: 1.2rem;
+  }
+
+  .employee-dashboard-chart-wrapper {
+    height: 250px;
+  }
+}
