@@ -1,0 +1,79 @@
+.employee-tasks-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .tasks-section {
+    margin-bottom: 30px;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 15px;
+  }
+  
+  .tasks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .task-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .task-item-details {
+    flex: 1;
+  }
+  
+  .task-item.completed {
+    background: #d4edda;
+  }
+  
+  .status-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .status-button.complete {
+    background: #28a745;
+  }
+  
+  .status-button:hover {
+    background: #0056b3;
+  }
+  
+  .status-button.complete:hover {
+    background: #218838;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    font-size: 1rem;
+    margin-top: 20px;
+    text-align: center;
+  }
+  

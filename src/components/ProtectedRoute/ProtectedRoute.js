@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedRoles = [] }) => {
   const { user } = useUser();
 
   if (!user) {
@@ -10,7 +10,12 @@ const ProtectedRoute = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />; 
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    console.warn(`Access denied for role: ${user.role}`);
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
